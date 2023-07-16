@@ -26,7 +26,6 @@ Application::Application()
 //#ifdef USE_I2S_MIC_INPUT
   m_input = new I2SMEMSSampler(I2S_NUM_0, i2s_mic_pins, i2s_mic_Config,128);
 //#else
-//  m_input = new ADCSampler(ADC_UNIT_1, ADC1_CHANNEL_7, i2s_adc_config);
 //#endif
 
 //m_output = new DACOutput(I2S_NUM_0);
