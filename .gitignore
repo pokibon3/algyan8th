@@ -2,7 +2,6 @@
 .github
 .pio
 .vscode
-lib
 test
 .gitgnore
 LICENSE
