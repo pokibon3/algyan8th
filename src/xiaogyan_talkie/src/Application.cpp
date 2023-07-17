@@ -73,7 +73,8 @@ void Application::begin()
   m_speaker -> begin();
   // start the main task for the application
   TaskHandle_t task_handle;
-  xTaskCreate(application_task, "application_task", 8192, this, 1, &task_handle);
+//  xTaskCreate(application_task, "application_task", 8192, this, 1, &task_handle);
+  xTaskCreateUniversal(application_task, "application_task", 8192, this, 1, &task_handle, CONFIG_ARDUINO_RUNNING_CORE);
 }
 
 // application task - coordinates everything
@@ -82,51 +83,51 @@ void Application::loop()
   int16_t *samples = reinterpret_cast<int16_t *>(malloc(sizeof(int16_t) * 128));
   uint8_t buf[128];
   // continue forever
-  while (true)
-  {
+  while (true) {
     // do we need to start transmitting?
-    if (!digitalRead(GPIO_TRANSMIT_BUTTON))
-    {
+    int16_t ptt = digitalRead(GPIO_TRANSMIT_BUTTON);
+    Serial.printf("ptt = %d\n", ptt);
+    //delay(100);
+    if (!ptt) {
       Serial.println("Started transmitting");
       // stop the output as we're switching into transmit mode
       m_speaker->stop();
       // start the input to get samples from the microphone
-      m_input->start();
+//      m_input->start();
       // transmit for at least 1 second or while the button is pushed
       unsigned long start_time = millis();
-      while (millis() - start_time < 1000 || !digitalRead(GPIO_TRANSMIT_BUTTON))
-      {
+      while (millis() - start_time < 1000 || !digitalRead(GPIO_TRANSMIT_BUTTON)) {
         // read samples from the microphone
-        int samples_read = m_input->read(samples, 128);
+        int samples_read = 0;
+//        samples_read = m_input->read(samples, 128);
         // and send them over the transport
         for (int i = 0; i < samples_read; i++)
         {
           m_transport->add_sample(samples[i]);
+          Serial.println(samples[i]);
         }
       }
       m_transport->flush();
       // finished transmitting stop the input and start the output
       Serial.println("Finished transmitting");
-      m_input->stop();
+//      m_input->stop();
       m_speaker->begin();
     }
     // while the transmit button is not pushed and 1 second has not elapsed
     Serial.println("Started Receiving");
-    //if (PWM_SPEAKER_SD_PIN != -1)
-    //{
-    //  digitalWrite(I2S_SPEAKER_SD_PIN, HIGH);
-    //}
     unsigned long start_time = millis();
-    while (millis() - start_time < 1000 || !digitalRead(GPIO_TRANSMIT_BUTTON))
+    while (millis() - start_time < 1000 || digitalRead(GPIO_TRANSMIT_BUTTON))
     {
       // read from the output buffer (which should be getting filled by the transport)
-      m_output_buffer->remove_samples(samples, 128);
+//      m_output_buffer->remove_samples(samples, 128);
       // and send the samples to the speaker
       //m_output->write(samples, 128);
-      for (int i = 0; i < 128; i++) {
-        buf[i] = (int8_t)((samples[i] >> 2) & 0x00ff);
-      }
+      //for (int i = 0; i < 128; i++) {
+      //  buf[i] = (int8_t)((samples[i] >> 2) & 0x00ff);
+      //  Serial.println(samples[i]);
+      //}
       m_speaker->play(buf, 128, SAMPLE_RATE);
+        delay(1);
     }
     //if (I2S_SPEAKER_SD_PIN != -1)
     //{

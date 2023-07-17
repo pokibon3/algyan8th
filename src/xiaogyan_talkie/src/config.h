@@ -7,7 +7,7 @@
 //#define WIFI_PSWD << YOUR_PASSWORD >>
 #define WIFI_SSID "bon1"
 #define WIFI_PSWD "mayutaro"
-
+#define USE_ESP_NOW
 // sample rate for the system
 #define SAMPLE_RATE 16000
 

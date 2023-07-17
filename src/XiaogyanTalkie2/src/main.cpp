@@ -1,13 +1,24 @@
 #include <Arduino.h>
 #include <driver/i2s.h>
+#include "Speaker.hpp"
 
 #define PIN_CLK     6
 #define PIN_DATA    5
 #define READ_LEN    (2 * 256)
 #define GAIN_FACTOR 3
-uint8_t BUFFER[READ_LEN] = {0};
+#define SPEAKER_PIN D0
+#define SPEAKER_ENABLE_PIN -1
+#define SPEAKER_LEDC_CHANNEL 0
 
-int16_t *adcBuffer = NULL;
+uint8_t BUFFER[READ_LEN] = {0};
+uint8_t speakerBuffer[256];
+
+
+uint16_t *micBuffer = NULL;
+
+Speaker speaker(SPEAKER_PIN, SPEAKER_ENABLE_PIN, SPEAKER_LEDC_CHANNEL);
+extern const unsigned char shupo_16k_u8_raw[];
+extern const unsigned int shupo_16k_u8_raw_len;
 
 void i2sInit()  // Init I2S.  初始化I2S
 {
@@ -43,8 +54,11 @@ void i2sInit()  // Init I2S.  初始化I2S
 
 void showSignal() {
     for (int i = 0; i < 256; i++){
-        Serial.println(adcBuffer[i]);
+        Serial.printf("%u\n", micBuffer[i]);
+//        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 2) & 0x00ff);
+        speakerBuffer[i] = (uint8_t)micBuffer[i];
     }
+    speaker.play(speakerBuffer, 256, 16000);
 }
 
 void mic_record_task(void *arg) {
@@ -52,7 +66,7 @@ void mic_record_task(void *arg) {
     while (1) {
         i2s_read(I2S_NUM_0, (char *)BUFFER, READ_LEN, &bytesread,
                  (100 / portTICK_RATE_MS));
-        adcBuffer = (int16_t *)BUFFER;
+        micBuffer = (uint16_t *)BUFFER;
         showSignal();
         vTaskDelay(100 / portTICK_RATE_MS);
     }
@@ -61,6 +75,8 @@ void mic_record_task(void *arg) {
 void setup() {
     Serial.begin();
     i2sInit();
+    speaker.begin();
+    //speaker.play(shupo_16k_u8_raw, shupo_16k_u8_raw_len, 16000);
     xTaskCreate(mic_record_task, "mic_record_task", 2048, NULL, 1, NULL);
 }
 // After the program in setup() runs, it runs the program in loop()
