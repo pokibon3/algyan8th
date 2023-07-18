@@ -19,6 +19,7 @@ class Speaker
 private:
     static constexpr uint32_t SPEAKER_PWM_FREQUENCY = 156250;
     static constexpr uint8_t SPEAKER_PWM_RESOLUTION_BITS = 8;
+    //static constexpr uint8_t SPEAKER_PWM_RESOLUTION_BITS = 16;
     static constexpr uint32_t SPEAKER_TIMER_FREQUENCY = 10000000;   // 10[MHz]
 
 private:

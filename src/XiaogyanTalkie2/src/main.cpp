@@ -19,6 +19,8 @@ uint16_t *micBuffer = NULL;
 Speaker speaker(SPEAKER_PIN, SPEAKER_ENABLE_PIN, SPEAKER_LEDC_CHANNEL);
 extern const unsigned char shupo_16k_u8_raw[];
 extern const unsigned int shupo_16k_u8_raw_len;
+extern const uint16_t sin_16k_u8_raw[];
+extern const unsigned int sin_16k_u8_raw_len;
 
 void i2sInit()  // Init I2S.  初始化I2S
 {
@@ -54,11 +56,12 @@ void i2sInit()  // Init I2S.  初始化I2S
 
 void showSignal() {
     for (int i = 0; i < 256; i++){
-        Serial.printf("%u\n", micBuffer[i]);
-//        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 2) & 0x00ff);
-        speakerBuffer[i] = (uint8_t)micBuffer[i];
+//        Serial.printf("%u,\n", micBuffer[i]);
+        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 2) & 0x00ff);
+//        speakerBuffer[i] = (uint8_t)micBuffer[i];
     }
-    speaker.play(speakerBuffer, 256, 16000);
+    speaker.play(speakerBuffer, 256, 32000);
+    //delay(4);
 }
 
 void mic_record_task(void *arg) {
@@ -72,11 +75,23 @@ void mic_record_task(void *arg) {
     }
 }
 // After M5StickC is started or reset
+uint8_t buf[16530], buf8;
 void setup() {
     Serial.begin();
     i2sInit();
     speaker.begin();
-    //speaker.play(shupo_16k_u8_raw, shupo_16k_u8_raw_len, 16000);
+#if 0
+    for(int i = 0; i < sin_16k_u8_raw_len; i++) {
+        buf8 = (sin_16k_u8_raw[i] >> 2) & 0x00ff;
+        buf[i] = buf8;
+        Serial.printf("%d : %d\n", sin_16k_u8_raw[i], buf8);
+    }
+    for (int i = 0; i < 10; i++) {
+        speaker.play(buf, sin_16k_u8_raw_len, 4000);
+        delay(1000);
+    }
+    speaker.play(shupo_16k_u8_raw, shupo_16k_u8_raw_len, 16000);
+#endif
     xTaskCreate(mic_record_task, "mic_record_task", 2048, NULL, 1, NULL);
 }
 // After the program in setup() runs, it runs the program in loop()
