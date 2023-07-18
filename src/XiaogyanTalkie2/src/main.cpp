@@ -51,17 +51,18 @@ void i2sInit()  // Init I2S.  初始化I2S
 
     i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
     i2s_set_pin(I2S_NUM_0, &pin_config);
-    i2s_set_clk(I2S_NUM_0, 44100, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
+    i2s_set_clk(I2S_NUM_0, 16000, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
+//    i2s_set_clk(I2S_NUM_0, 16000, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
 }
 
 void showSignal() {
     for (int i = 0; i < 256; i++){
 //        Serial.printf("%u,\n", micBuffer[i]);
-        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 2) & 0x00ff);
+        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 3) & 0x00ff);
 //        speakerBuffer[i] = (uint8_t)micBuffer[i];
     }
-    speaker.play(speakerBuffer, 256, 32000);
-    //delay(4);
+    speaker.play(speakerBuffer, 256, 16000);
+    //delay(8);
 }
 
 void mic_record_task(void *arg) {
@@ -74,7 +75,7 @@ void mic_record_task(void *arg) {
         vTaskDelay(100 / portTICK_RATE_MS);
     }
 }
-// After M5StickC is started or reset
+
 uint8_t buf[16530], buf8;
 void setup() {
     Serial.begin();
