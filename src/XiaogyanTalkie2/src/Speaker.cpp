@@ -70,7 +70,8 @@ void Speaker::setTone(int frequency)
     ledcWriteTone(ledControlChannel_, frequency);
 }
 
-void Speaker::play(const uint8_t* wave, size_t length, uint32_t frequency)
+//void Speaker::play(const uint8_t* wave, size_t length, uint32_t frequency)
+void Speaker::play(const uint16_t* wave, size_t length, uint32_t frequency)
 {
 	noInterrupts();
     wavePtr_ = wave;

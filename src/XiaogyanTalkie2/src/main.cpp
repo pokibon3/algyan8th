@@ -55,24 +55,29 @@ void i2sInit()  // Init I2S.  初始化I2S
 //    i2s_set_clk(I2S_NUM_0, 16000, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
 }
 
-void showSignal() {
-    for (int i = 0; i < 256; i++){
+void showSignal() 
+{
+//    for (int i = 0; i < 256; i++){
 //        Serial.printf("%u,\n", micBuffer[i]);
-        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 3) & 0x00ff);
+//        speakerBuffer[i] = (uint8_t)((micBuffer[i] >> 3) & 0x00ff);
 //        speakerBuffer[i] = (uint8_t)micBuffer[i];
-    }
-    speaker.play(speakerBuffer, 256, 16000);
+//    }
+    //speaker.play(speakerBuffer, 256, 16000);
+    speaker.play(micBuffer, 256, 16000);
     //delay(8);
 }
 
-void mic_record_task(void *arg) {
+void mic_record_task(void *arg) 
+{
     size_t bytesread;
     while (1) {
         i2s_read(I2S_NUM_0, (char *)BUFFER, READ_LEN, &bytesread,
-                 (100 / portTICK_RATE_MS));
+                 (16 / portTICK_RATE_MS));
         micBuffer = (uint16_t *)BUFFER;
-        showSignal();
-        vTaskDelay(100 / portTICK_RATE_MS);
+        //Serial.printf("%ld\n", bytesread);
+        speaker.play(micBuffer, bytesread / 2, 16000);
+        //showSignal();
+        vTaskDelay(16 / portTICK_RATE_MS);
     }
 }
 
