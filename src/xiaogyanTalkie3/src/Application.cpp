@@ -56,6 +56,7 @@ void Application::begin()
 // application task - coordinates everything
 uint8_t BUFFER[256] = {0};
 uint16_t *micBuffer = NULL;
+uint16_t counter = 0;
 
 void Application::loop()
 {
@@ -81,9 +82,14 @@ void Application::loop()
 //debug        m_speaker->play(micBuffer, 128, SAMPLE_RATE);
 
         // and send them over the transport
+        samples_read = 128;
         for (int i = 0; i < samples_read; i++) {
-          m_transport->add_sample(BUFFER[i]);
+//          m_transport->add_sample(BUFFER[i]);
+          m_transport->add_sample((counter & 0xff00) >> 8);
+          m_transport->add_sample(counter & 0x00ff);
+          counter++;
         }
+        break;      // debug
       }
       m_transport->flush();
       // finished transmitting stop the input and start the output
@@ -98,6 +104,10 @@ void Application::loop()
       // read from the output buffer (which should be getting filled by the transport)
       m_output_buffer->remove_samples(BUFFER, 256);
       m_speaker->play(micBuffer, 128, SAMPLE_RATE);
+      for (int i = 0; i < 128; i++) {
+        if (micBuffer[i] != 0)
+          Serial.println(micBuffer[i]);
+      }
       delay(1);
     }
     Serial.println("Finished Receiving");

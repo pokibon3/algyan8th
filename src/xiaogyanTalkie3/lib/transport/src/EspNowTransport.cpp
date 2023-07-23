@@ -65,6 +65,9 @@ EspNowTransport::EspNowTransport(OutputBuffer *output_buffer, uint8_t wifi_chann
 void EspNowTransport::send()
 {
   esp_err_t result = esp_now_send(broadcastAddress, m_buffer, m_index + m_header_size);
+  Serial.printf("m_index : %d\n", m_index);
+  for (int i = 0; i < m_index; i++) 
+    Serial.println(m_buffer[i]);
   if (result != ESP_OK) {
     Serial.printf("Failed to send: %s\n", esp_err_to_name(result));
   }
