@@ -1,0 +1,4 @@
+[submodule "docs"]
+	path = docs
+	url = https://github.com/algyan/xiaogyan_arduino
+	branch = gh-pages
