@@ -103,10 +103,13 @@ void Application::loop()
       m_output_buffer->remove_samples(BUFFER, 256);
       m_speaker->play(micBuffer, 128, SAMPLE_RATE);
       for (int i = 0; i < 128; i++) {
-        if (micBuffer[i] != 0)
-          Serial.println(micBuffer[i]);
+        if (micBuffer[i] != 0 && micBuffer[i] < 10000) {
+          Serial.print(micBuffer[i]);
+          Serial.println();
+//          delay(1);
+        }
       }
-      delay(1);
+//      delay(1);
     }
     Serial.println("Finished Receiving");
   }
