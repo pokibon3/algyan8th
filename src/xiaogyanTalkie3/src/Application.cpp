@@ -56,7 +56,6 @@ void Application::begin()
 // application task - coordinates everything
 uint8_t BUFFER[256] = {0};
 uint16_t *micBuffer = NULL;
-uint16_t counter = 0;
 
 void Application::loop()
 {
@@ -82,14 +81,13 @@ void Application::loop()
 //debug        m_speaker->play(micBuffer, 128, SAMPLE_RATE);
 
         // and send them over the transport
-        samples_read = 128;
-        for (int i = 0; i < samples_read; i++) {
+        for (int i = 0; i < samples_read / 2; i++) {
+          uint16_t sample = micBuffer[i] >> 2;
+          m_transport->add_sample(sample & 0x00ff);
+          m_transport->add_sample((sample & 0xff00) >> 8);
 //          m_transport->add_sample(BUFFER[i]);
-          m_transport->add_sample((counter & 0xff00) >> 8);
-          m_transport->add_sample(counter & 0x00ff);
-          counter++;
         }
-        break;      // debug
+//        break;      // debug
       }
       m_transport->flush();
       // finished transmitting stop the input and start the output
