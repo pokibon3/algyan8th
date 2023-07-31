@@ -55,12 +55,12 @@ void Application::begin()
 
 // application task - coordinates everything
 uint8_t BUFFER[256] = {0};
-uint16_t *micBuffer = NULL;
+int16_t *micBuffer = NULL;
 
 void Application::loop()
 {
 //  int16_t *samples = reinterpret_cast<int16_t *>(malloc(sizeof(int16_t) * 128));
-  micBuffer = (uint16_t *)BUFFER;
+  micBuffer = (int16_t *)BUFFER;
 
   // continue forever
   while (true) {
@@ -82,9 +82,12 @@ void Application::loop()
 
         // and send them over the transport
         for (int i = 0; i < samples_read / 2; i++) {
-          uint16_t sample = micBuffer[i] >> 2;
+//          uint16_t sample = micBuffer[i] >> 2;
+//          uint16_t sample = (micBuffer[i] >> 1) - 300;
+          uint16_t sample = micBuffer[i] + 32768;
           m_transport->add_sample(sample & 0x00ff);
           m_transport->add_sample((sample & 0xff00) >> 8);
+//          Serial.println(sample);
 //          m_transport->add_sample(BUFFER[i]);
         }
 //        break;      // debug
@@ -101,15 +104,15 @@ void Application::loop()
     {
       // read from the output buffer (which should be getting filled by the transport)
       m_output_buffer->remove_samples(BUFFER, 256);
+      while(m_speaker->busy());
       m_speaker->play(micBuffer, 128, SAMPLE_RATE);
-      for (int i = 0; i < 128; i++) {
-        if (micBuffer[i] != 0 && micBuffer[i] < 10000) {
-          Serial.print(micBuffer[i]);
-          Serial.println();
+//      for (int i = 0; i < 128; i++) {
+//        if (micBuffer[i] != 0 && micBuffer[i] < 10000) {
+//          Serial.println(micBuffer[i]);
 //          delay(1);
-        }
-      }
-//      delay(1);
+//        }
+//      }
+//      delay(8);
     }
     Serial.println("Finished Receiving");
   }

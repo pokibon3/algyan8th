@@ -10,11 +10,13 @@
 #include <Arduino.h>
 #include <elapsedMillis.h>
 #include "Xiaogyan.hpp"
+#include "PDMmic.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 
 static int EncoderValue_ = 5;
+PDMmic mic;
 
 ////////////////////////////////////////////////////////////////////////////////
 // setup and loop
@@ -30,7 +32,7 @@ void setup()
     // Initialize
 
     Xiaogyan.begin();
-
+    mic.begin();
     Xiaogyan.encoder.setRotatedHandler([](bool cw){
         const int value = EncoderValue_ + (cw ? -1 : 1);
         EncoderValue_ = constrain(value, 0, 19);
@@ -49,11 +51,22 @@ void setup()
     Xiaogyan.ledMatrix.fillScreen(0);
 }
 
+static uint8_t  micBuf[256];
+static size_t   micBufsize;
+static int16_t *micData;
+
 void loop()
 {
     // Xiaogyan
     Xiaogyan.doWork();
-
+    size_t readSize;
+    micData = (int16_t *)micBuf;
+    while(1) {
+    mic.read(micBuf, 256, &readSize);
+        for (int i = 0; i < readSize / 2; i++) {
+            Serial.println(micData[i]);
+        }
+    }
     // LED
     Xiaogyan.led.write(millis() % 1000 < 200 ? LOW : HIGH);
 

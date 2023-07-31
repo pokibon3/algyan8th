@@ -16,9 +16,9 @@ void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 //  Serial.printf("receive size : %d", dataLen);
   // annoyingly we can't pass an param into this so we need to do a bit of hack to access the EspNowTransport instance
   int header_size = instance->m_header_size;
-  for (int i = 0; i < dataLen / 2; i++) {
-    Serial.println(bufp[i]);
-  }
+//  for (int i = 0; i < dataLen / 2; i++) {
+//    Serial.println(bufp[i]);
+//  }
   // first m_header_size bytes of m_buffer are the expected header
   if ((dataLen > header_size) && (dataLen<=MAX_ESP_NOW_PACKET_SIZE) && (memcmp(data,instance->m_buffer,header_size) == 0)) 
   {
