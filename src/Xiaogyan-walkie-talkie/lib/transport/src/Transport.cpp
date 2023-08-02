@@ -12,21 +12,11 @@ Transport::Transport(OutputBuffer *output_buffer, size_t buffer_size)
 
 void Transport::add_sample(int16_t sample)
 {
-//  uint8_t work =(sample + 32768UL) >> 8;
-//  uint8_t work =(sample + 600UL) >> 3;
-  int16_t work = sample >> 3;
-          work = (work < -128) ? -128 : ((work > 127) ? 127 : work) ;
-  uint8_t work2 = (work + 128) & 0x00ff;
-
-  m_buffer[m_index+m_header_size] = work2;
-//  m_buffer[m_index+m_header_size] = sample;
-//  Serial.println(work2);
-//  Serial.println(sample);
+  m_buffer[m_index+m_header_size] = (sample + 32768) >> 8;
   m_index++;
   // have we reached a full packet?
-  if ((m_index + m_header_size) == m_buffer_size)
+  if ((m_index+m_header_size) == m_buffer_size)
   {
-//    Serial.println("Send");
     send();
     m_index = 0;
   }

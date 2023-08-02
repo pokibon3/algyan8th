@@ -54,15 +54,15 @@ void Application::begin()
 }
 
 // application task - coordinates everything
-//uint8_t BUFFER[256] = {0};
+int16_t BUFFER[256] = {0};
 //int16_t *micBuffer = NULL;
+uint16_t *speakerBuffer = NULL;
 
 void Application::loop()
 {
-  int16_t *samples = reinterpret_cast<int16_t *>(malloc(sizeof(int16_t) * 128));
+//  int16_t *samples = reinterpret_cast<int16_t *>(malloc(sizeof(int16_t) * 128));
 //  micBuffer = (int16_t *)BUFFER;
-
-//  m_input->start();
+  speakerBuffer = (uint16_t *)BUFFER;
 
   // continue forever
   while (true) {
@@ -79,20 +79,17 @@ void Application::loop()
       while (millis() - start_time < 1000 || !digitalRead(GPIO_TRANSMIT_BUTTON)) {
         // read samples from the microphone
         size_t samples_read = 0;
-        i2s_read(I2S_NUM_0, (char *)samples, 256, &samples_read, portMAX_DELAY);
+        i2s_read(I2S_NUM_0, (char *)BUFFER, 256, &samples_read, portMAX_DELAY);
 //debug        m_speaker->play(micBuffer, 128, SAMPLE_RATE);
-//        int samples_read = m_input->read(samples, 128);
+
         // and send them over the transport
         for (int i = 0; i < samples_read / 2; i++) {
 //          uint16_t sample = micBuffer[i] >> 2;
 //          uint16_t sample = (micBuffer[i] >> 1) - 300;
 //          uint16_t sample = micBuffer[i] + 32768;
+          m_transport->add_sample(BUFFER[i]);
 //          m_transport->add_sample(sample & 0x00ff);
 //          m_transport->add_sample((sample & 0xff00) >> 8);
-//          m_transport->add_sample(samples[i] - 1200);         // COM18
-          m_transport->add_sample(samples[i] - 600);        // COM10
-//          Serial.println(samples[i] - 1200);
-//          Serial.println(samples[i] - 600);
 //          Serial.println(sample);
 //          m_transport->add_sample(BUFFER[i]);
         }
@@ -109,18 +106,16 @@ void Application::loop()
     while (millis() - start_time < 1000 || digitalRead(GPIO_TRANSMIT_BUTTON))
     {
       // read from the output buffer (which should be getting filled by the transport)
-//      m_output_buffer->remove_samples(BUFFER, 256);
-//      m_output_buffer->remove_samples((uint16_t *)samples, 128);
-      m_output_buffer->remove_samples((uint8_t *)samples, 128);
-
+      m_output_buffer->remove_samples(BUFFER, 256);
       while(m_speaker->busy());
-//      m_speaker->play((uint16_t *)samples, 128, SAMPLE_RATE);
-      m_speaker->play((uint8_t *)samples, 128, SAMPLE_RATE);
+      m_speaker->play(speakerBuffer, 256, SAMPLE_RATE);
 //      for (int i = 0; i < 128; i++) {
-//        if (samples[i] != 0) {
-//          Serial.println(samples[i]);
+//        if (micBuffer[i] != 0 && micBuffer[i] < 10000) {
+//          Serial.println(micBuffer[i]);
+//          delay(1);
 //        }
 //      }
+//      delay(8);
     }
     Serial.println("Finished Receiving");
   }

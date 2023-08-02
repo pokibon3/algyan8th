@@ -1,4 +1,4 @@
-#include <Arduino.h>
+  #include <Arduino.h>
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_wifi.h>
@@ -9,16 +9,12 @@ const int MAX_ESP_NOW_PACKET_SIZE = 250;
 const uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 static EspNowTransport *instance = NULL;
-uint16_t *bufp;
+
 void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 {
-//  bufp = (uint16_t *)data;
-//  Serial.printf("receive size : %d", dataLen);
   // annoyingly we can't pass an param into this so we need to do a bit of hack to access the EspNowTransport instance
   int header_size = instance->m_header_size;
-//  for (int i = 0; i < dataLen; i++) {
-//    Serial.println(data[i]);
-//  }
+  
   // first m_header_size bytes of m_buffer are the expected header
   if ((dataLen > header_size) && (dataLen<=MAX_ESP_NOW_PACKET_SIZE) && (memcmp(data,instance->m_buffer,header_size) == 0)) 
   {
@@ -67,11 +63,10 @@ EspNowTransport::EspNowTransport(OutputBuffer *output_buffer, uint8_t wifi_chann
 
 void EspNowTransport::send()
 {
+
   esp_err_t result = esp_now_send(broadcastAddress, m_buffer, m_index + m_header_size);
-//  Serial.printf("m_index : %d\n", m_index);
-//  for (int i = 0; i < m_index; i++) 
-//    Serial.println(m_buffer[i]);
-  if (result != ESP_OK) {
+  if (result != ESP_OK)
+  {
     Serial.printf("Failed to send: %s\n", esp_err_to_name(result));
   }
 }

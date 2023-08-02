@@ -31,8 +31,6 @@ void I2SMEMSSampler::configureI2S()
     }
 
     i2s_set_pin(m_i2sPort, &m_i2sPins);
-    i2s_set_clk(m_i2sPort, 16000, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
-
 }
 
 int I2SMEMSSampler::read(int16_t *samples, int count)

@@ -1,3 +1,4 @@
+// 20230731 add is2_set_clk() by K.Ohe
 #include "I2SMEMSSampler.h"
 #include "soc/i2s_reg.h"
 
@@ -31,8 +32,7 @@ void I2SMEMSSampler::configureI2S()
     }
 
     i2s_set_pin(m_i2sPort, &m_i2sPins);
-    i2s_set_clk(m_i2sPort, 16000, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
-
+    i2s_set_clk(m_i2sPort, 16000, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);  // 20230731
 }
 
 int I2SMEMSSampler::read(int16_t *samples, int count)
