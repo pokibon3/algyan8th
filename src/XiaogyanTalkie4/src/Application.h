@@ -2,7 +2,8 @@
 
 //class Output;
 class Speaker;
-class I2SSampler;
+//class I2SSampler;
+class PDMMic;
 class Transport;
 class OutputBuffer;
 
@@ -10,7 +11,8 @@ class Application
 {
 private:
     Speaker     *m_speaker;
-    I2SSampler  *m_input;
+//    I2SSampler  *m_input;
+    PDMMic  *m_input;
     Transport   *m_transport;
     OutputBuffer *m_output_buffer;
 
