@@ -1,116 +1,60 @@
 /*
  * main.cpp
- * Copyright (C) 2023 MATSUOKA Takashi <matsujirushi@live.jp>
+ * Copyright (C) 2023 K.Ohe 
  * MIT License
  */
-
-////////////////////////////////////////////////////////////////////////////////
 // Includes
-
 #include <Arduino.h>
 #include <elapsedMillis.h>
 #include "Xiaogyan.hpp"
-#include "PDMmic.hpp"
+#include "Application.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Variables
+static int EncoderValue_ = 1;
+Application *application;
 
-static int EncoderValue_ = 5;
-PDMmic mic;
-
-////////////////////////////////////////////////////////////////////////////////
 // setup and loop
-
 void setup()
 {
     Serial.begin(115200);
-    delay(1000);
-    Serial.println();
-    Serial.println();
 
     ////////////////////////////////////////
     // Initialize
-
     Xiaogyan.begin();
-    mic.begin();
     Xiaogyan.encoder.setRotatedHandler([](bool cw){
         const int value = EncoderValue_ + (cw ? -1 : 1);
-        EncoderValue_ = constrain(value, 0, 19);
+        EncoderValue_ = constrain(value, 1, 13);
         Serial.println(EncoderValue_);
     });
 
-    ////////////////////////////////////////
     // Startup Sequence
-
-    Xiaogyan.speaker.setTone(262);  // C4
+    //Xiaogyan.speaker.setTone(262);  // C4
     Xiaogyan.ledMatrix.setBrightness(2);
     Xiaogyan.ledMatrix.fillScreen(1);
-    delay(200);
+    delay(100);
+    Xiaogyan.ledMatrix.fillScreen(2);
+    delay(100);
+    Xiaogyan.ledMatrix.fillScreen(3);
+    delay(100);
 
     Xiaogyan.speaker.setTone(0);
     Xiaogyan.ledMatrix.fillScreen(0);
-}
+    // Start Walkie Talkie
+    application = new Application();
+    application->begin();
+    Serial.println("XIAOGYAN Walkie Talkie Application started");
 
-static uint8_t  micBuf[256];
-static size_t   micBufsize;
-static int16_t *micData;
+}
 
 void loop()
 {
     // Xiaogyan
     Xiaogyan.doWork();
-    size_t readSize;
-    micData = (int16_t *)micBuf;
-    while(1) {
-    mic.read(micBuf, 256, &readSize);
-        for (int i = 0; i < readSize / 2; i++) {
-            Serial.println(micData[i]);
-        }
-    }
     // LED
     Xiaogyan.led.write(millis() % 1000 < 200 ? LOW : HIGH);
 
-    // Buttons
-    static bool buttonA = false;
-    static bool buttonB = false;
-    bool preButtonA = buttonA;
-    bool preButtonB = buttonB;
-    buttonA = Xiaogyan.buttonA.read() == LOW;
-    buttonB = Xiaogyan.buttonB.read() == LOW;
-    if (preButtonA != buttonA || preButtonB != buttonB)
-    {
-        if      ( buttonA && !buttonB) Xiaogyan.speaker.setTone(262);   // C4
-        else if (!buttonA &&  buttonB) Xiaogyan.speaker.setTone(294);   // D4
-        else if ( buttonA &&  buttonB) Xiaogyan.speaker.setTone(330);   // E4
-        else                           Xiaogyan.speaker.setTone(0);
-    }
+    vTaskDelay(pdMS_TO_TICKS(1));
 
-    // Led Matrix
-    static const int COLOR_MAP[] = { 1, 0, 2, 0, 3, 0, };
-    static int x = 0;
-    static int y = 0;
-    static int colorIndex = 0;
-    static elapsedMillis ledMatrixElapsed{ 0 };
-
-    if (ledMatrixElapsed >= (EncoderValue_ + 1) * 10)
-    {
-        ledMatrixElapsed = 0;
-
-        Xiaogyan.ledMatrix.drawPixel(x, y, COLOR_MAP[colorIndex]);
-
-        if (++x >= Xiaogyan.ledMatrix.width())
-        {
-            x = 0;
-            if (++colorIndex >= std::extent<decltype(COLOR_MAP)>::value)
-            {
-                colorIndex = 0;
-                if (++y >= Xiaogyan.ledMatrix.height())
-                {
-                    y = 0;
-                }
-            }
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

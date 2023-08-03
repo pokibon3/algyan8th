@@ -30,13 +30,38 @@ i2s_pin_config_t i2s_mic_pins = {
     .data_in_num = I2S_MIC_SERIAL_DATA
 };
 
-void PDMmic::begin(void) 
+
+PDMMic::PDMMic(void) 
+{
+    offset = 0;
+}
+
+void PDMMic::start(void) 
 {
     i2s_driver_install(I2S_NUM_0, &i2s_mic_Config, 0, NULL);
     i2s_set_pin(I2S_NUM_0, &i2s_mic_pins);
     i2s_set_clk(I2S_NUM_0, HZ_SAMPLE_RATE, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
 }
 
-void PDMmic::read(uint8_t *buf, size_t bufSize, size_t *readSize) {
+void PDMMic::read(uint8_t *buf, size_t bufSize, size_t *readSize)
+{
+    int16_t *sample = (int16_t *)buf;
+    int32_t newOffset = 0;
+
     i2s_read(I2S_NUM_0, buf, bufSize, readSize, portMAX_DELAY);
+    int16_t count = *readSize /2;
+    for (int i = 0; i < count; i++) {
+        newOffset += sample[i];
+        sample[i] -= offset;
+//        Serial.println(sample[i]);
+    }
+    newOffset /= count;
+//    Serial.printf("offset : %d, %d\n", offset, newOffset);
+    offset = newOffset;
+}
+
+void PDMMic::stop(void) 
+{
+    // stop the i2S driver
+    i2s_driver_uninstall(I2S_NUM_0);
 }

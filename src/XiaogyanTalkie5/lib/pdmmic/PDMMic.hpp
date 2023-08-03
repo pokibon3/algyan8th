@@ -10,9 +10,13 @@
 
 // esp32-hal-timer.h
 
-class PDMmic
+class PDMMic
 {
+private:
+    int16_t offset;
 public:
-    void begin();
+    PDMMic(void);
+    void start();
+    void stop();
     void read(uint8_t *buf, size_t bufSize, size_t *readSize);
 };
