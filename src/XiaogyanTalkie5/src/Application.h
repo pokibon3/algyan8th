@@ -17,7 +17,8 @@ private:
 
 public:
     Application();
-    void dispRSSI();
+    int16_t getRSSI(void);
+    void dispRSSI(int16_t);
     void begin();
     void loop();
     void setChannel(uint16_t ch);

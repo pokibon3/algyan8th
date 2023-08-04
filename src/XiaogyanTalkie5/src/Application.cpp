@@ -53,13 +53,14 @@ void Application::setChannel(uint16_t ch)
 }
 
 int16_t rssi_level[] = {
-    -50, -44, -38, -32, -26, -20, -10, 0
+//    -50, -44, -38, -32, -26, -20, -10, 0
+    -56, -50, -44, -38, -32, -26, -20, -10
 };
 
-void Application::dispRSSI()
+void Application::dispRSSI(int16_t rssi)
 {
-    int16_t rssi = m_transport->getRSSI();
 //    Serial.println(rssi);
+    Xiaogyan.ledMatrix.setBrightness(3);
     for (int i = 0; i < 8; i++) {
         if (rssi > rssi_level[i]) {
             Xiaogyan.ledMatrix.drawPixel(i, 7, (i > 4)? 1 : 2);
@@ -68,6 +69,12 @@ void Application::dispRSSI()
         }
     }
 }
+
+int16_t Application::getRSSI()
+{
+    return m_transport->getRSSI();
+}
+
 
 // application task - coordinates everything
 void Application::loop()
@@ -79,6 +86,7 @@ void Application::loop()
         int16_t ptt = Xiaogyan.buttonA.read();
         if (!ptt) {
             Serial.println("Started transmitting");
+            dispRSSI(0);                    // meter full scale
             Xiaogyan.speaker.stop();
             m_input->start();
             unsigned long start_time = millis();
@@ -99,7 +107,7 @@ void Application::loop()
         unsigned long start_time = millis();
         //while (millis() - start_time < 1000 || digitalRead(GPIO_TRANSMIT_BUTTON)) {
         while (millis() - start_time < 1000 || Xiaogyan.buttonA.read()) {
-            if ((dispCount++ % 10) == 0) dispRSSI();
+            if ((dispCount++ % 10) == 0) dispRSSI(getRSSI());
             m_output_buffer->remove_samples((uint8_t *)samples, 128);
             //while(m_speaker->busy());               // until speaker is free
             while(Xiaogyan.speaker.busy()) {               // until speaker is free
