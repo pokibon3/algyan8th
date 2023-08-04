@@ -47,11 +47,26 @@ void Application::begin()
     xTaskCreate(application_task, "application_task", 8192, this, 1, &task_handle);
 }
 
+void Application::setChannel(uint16_t ch) 
+{
+    m_transport->setWifiChannel(ch);
+}
+
+int16_t rssi_level[] = {
+    -50, -44, -38, -32, -26, -20, -10, 0
+};
 
 void Application::dispRSSI()
 {
     int16_t rssi = m_transport->getRSSI();
-    Serial.println(rssi);
+//    Serial.println(rssi);
+    for (int i = 0; i < 8; i++) {
+        if (rssi > rssi_level[i]) {
+            Xiaogyan.ledMatrix.drawPixel(i, 7, (i > 4)? 1 : 2);
+        } else {
+            Xiaogyan.ledMatrix.drawPixel(i, 7, 0);
+        }
+    }
 }
 
 // application task - coordinates everything

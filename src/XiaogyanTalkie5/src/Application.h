@@ -20,4 +20,5 @@ public:
     void dispRSSI();
     void begin();
     void loop();
+    void setChannel(uint16_t ch);
 };

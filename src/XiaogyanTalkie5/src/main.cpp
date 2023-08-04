@@ -13,6 +13,10 @@
 static int EncoderValue_ = 1;
 Application *application;
 
+char channel[] = {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D'
+};
+
 // setup and loop
 void setup()
 {
@@ -21,10 +25,13 @@ void setup()
     ////////////////////////////////////////
     // Initialize
     Xiaogyan.begin();
+
     Xiaogyan.encoder.setRotatedHandler([](bool cw){
-        const int value = EncoderValue_ + (cw ? -1 : 1);
+        const int value = EncoderValue_ + (cw ? 1 : -1);
         EncoderValue_ = constrain(value, 1, 13);
         Serial.println(EncoderValue_);
+        application->setChannel((uint16_t)EncoderValue_);
+        Xiaogyan.ledMatrix.drawChar(1, 0, channel[EncoderValue_], 1, 0, 1);
     });
 
     // Startup Sequence
@@ -38,6 +45,7 @@ void setup()
     delay(200);
     //Xiaogyan.speaker.setTone(0);
     Xiaogyan.ledMatrix.fillScreen(0);
+    Xiaogyan.ledMatrix.drawChar(1, 0, channel[EncoderValue_], 1, 0, 1);
     // Start Walkie Talkie
     application = new Application();
     application->begin();

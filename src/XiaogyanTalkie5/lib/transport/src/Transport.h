@@ -24,7 +24,7 @@ public:
   void flush();
   virtual bool        begin() = 0;
   virtual int16_t     getRSSI() = 0;
-//  virtual void        setRSSI();
+//  virtual void        setRSSI() = 0;
   virtual uint16_t    getWifiChannel() = 0;
-//  virtual void        setWifiChannel();
+  virtual void        setWifiChannel(uint16_t) = 0;
 };

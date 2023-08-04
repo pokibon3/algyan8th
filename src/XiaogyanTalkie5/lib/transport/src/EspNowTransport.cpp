@@ -32,6 +32,14 @@ void promiscuous_rx_cb(void *buf, wifi_promiscuous_pkt_type_t type) {
   instance->EspNowTransport::setRSSI(ppkt->rx_ctrl.rssi);
 }
 
+void EspNowTransport::setWifiChannel(uint16_t ch)
+{
+    m_wifi_channel  = ch;
+    esp_wifi_set_channel(m_wifi_channel, WIFI_SECOND_CHAN_NONE);
+}
+
+
+
 bool EspNowTransport::begin()
 {
   // Set Wifi channel
