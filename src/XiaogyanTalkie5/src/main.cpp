@@ -31,13 +31,12 @@ void setup()
     //Xiaogyan.speaker.setTone(262);  // C4
     Xiaogyan.ledMatrix.setBrightness(2);
     Xiaogyan.ledMatrix.fillScreen(1);
-    delay(100);
+    delay(200);
     Xiaogyan.ledMatrix.fillScreen(2);
-    delay(100);
+    delay(200);
     Xiaogyan.ledMatrix.fillScreen(3);
-    delay(100);
-
-    Xiaogyan.speaker.setTone(0);
+    delay(200);
+    //Xiaogyan.speaker.setTone(0);
     Xiaogyan.ledMatrix.fillScreen(0);
     // Start Walkie Talkie
     application = new Application();

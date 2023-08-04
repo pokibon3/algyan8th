@@ -12,18 +12,24 @@ static EspNowTransport *instance = NULL;
 uint16_t *bufp;
 void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen)
 {
-//  bufp = (uint16_t *)data;
-//  Serial.printf("receive size : %d", dataLen);
-  // annoyingly we can't pass an param into this so we need to do a bit of hack to access the EspNowTransport instance
-  int header_size = instance->m_header_size;
-//  for (int i = 0; i < dataLen; i++) {
-//    Serial.println(data[i]);
-//  }
-  // first m_header_size bytes of m_buffer are the expected header
-  if ((dataLen > header_size) && (dataLen<=MAX_ESP_NOW_PACKET_SIZE) && (memcmp(data,instance->m_buffer,header_size) == 0)) 
-  {
-    instance->m_output_buffer->add_samples(data + header_size, dataLen - header_size);
-  }
+    // annoyingly we can't pass an param into this so we need to do a bit of hack to access the EspNowTransport instance
+    int header_size = instance->m_header_size;
+    // first m_header_size bytes of m_buffer are the expected header
+    if ((dataLen > header_size) && (dataLen<=MAX_ESP_NOW_PACKET_SIZE) && (memcmp(data,instance->m_buffer,header_size) == 0)) {
+      instance->m_output_buffer->add_samples(data + header_size, dataLen - header_size);
+    }
+}
+
+//La callback que hace la magia
+void promiscuous_rx_cb(void *buf, wifi_promiscuous_pkt_type_t type) {
+  // All espnow traffic uses action frames which are a subtype of the mgmnt frames so filter out everything else.
+  if (type != WIFI_PKT_MGMT)
+    return;
+
+  const wifi_promiscuous_pkt_t *ppkt = (wifi_promiscuous_pkt_t *)buf;
+
+  //instance->m_transport->m_rssi = ppkt->rx_ctrl.rssi;
+  instance->EspNowTransport::setRSSI(ppkt->rx_ctrl.rssi);
 }
 
 bool EspNowTransport::begin()
@@ -38,6 +44,8 @@ bool EspNowTransport::begin()
   {
     Serial.println("ESPNow Init Success");
     esp_now_register_recv_cb(receiveCallback);
+    esp_wifi_set_promiscuous(true);
+    esp_wifi_set_promiscuous_rx_cb(&promiscuous_rx_cb);
   }
   else
   {

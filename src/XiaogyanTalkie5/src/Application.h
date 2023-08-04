@@ -10,14 +10,14 @@ class OutputBuffer;
 class Application
 {
 private:
-    Speaker     *m_speaker;
-//    I2SSampler  *m_input;
-    PDMMic  *m_input;
-    Transport   *m_transport;
-    OutputBuffer *m_output_buffer;
+    Speaker         *m_speaker;
+    PDMMic          *m_input;
+    Transport       *m_transport;
+    OutputBuffer    *m_output_buffer;
 
 public:
     Application();
+    void dispRSSI();
     void begin();
     void loop();
 };

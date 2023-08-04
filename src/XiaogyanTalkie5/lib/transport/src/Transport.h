@@ -22,5 +22,9 @@ public:
   int set_header(const int header_size, const uint8_t *header);
   void add_sample(int16_t sample);
   void flush();
-  virtual bool begin() = 0;
+  virtual bool        begin() = 0;
+  virtual int16_t     getRSSI() = 0;
+//  virtual void        setRSSI();
+  virtual uint16_t    getWifiChannel() = 0;
+//  virtual void        setWifiChannel();
 };

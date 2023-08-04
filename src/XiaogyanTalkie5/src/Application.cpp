@@ -47,11 +47,18 @@ void Application::begin()
     xTaskCreate(application_task, "application_task", 8192, this, 1, &task_handle);
 }
 
+
+void Application::dispRSSI()
+{
+    int16_t rssi = m_transport->getRSSI();
+    Serial.println(rssi);
+}
+
 // application task - coordinates everything
 void Application::loop()
 {
     int16_t *samples = reinterpret_cast<int16_t *>(malloc(sizeof(int16_t) * 128));
-
+    uint32_t dispCount = 0;
     while (true) {
         //int16_t ptt = digitalRead(GPIO_TRANSMIT_BUTTON);
         int16_t ptt = Xiaogyan.buttonA.read();
@@ -77,6 +84,7 @@ void Application::loop()
         unsigned long start_time = millis();
         //while (millis() - start_time < 1000 || digitalRead(GPIO_TRANSMIT_BUTTON)) {
         while (millis() - start_time < 1000 || Xiaogyan.buttonA.read()) {
+            if ((dispCount++ % 10) == 0) dispRSSI();
             m_output_buffer->remove_samples((uint8_t *)samples, 128);
             //while(m_speaker->busy());               // until speaker is free
             while(Xiaogyan.speaker.busy()) {               // until speaker is free
