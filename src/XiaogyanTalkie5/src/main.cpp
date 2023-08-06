@@ -60,7 +60,7 @@ void loop()
     // LED
     Xiaogyan.led.write(millis() % 1000 < 200 ? LOW : HIGH);
 
-    vTaskDelay(pdMS_TO_TICKS(50));
+    vTaskDelay(pdMS_TO_TICKS(5));
 
 }
 
