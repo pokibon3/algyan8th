@@ -54,7 +54,9 @@ void Application::setChannel(uint16_t ch)
 
 int16_t rssi_level[] = {
 //    -50, -44, -38, -32, -26, -20, -10, 0
-    -56, -50, -44, -38, -32, -26, -20, -10
+//    -56, -50, -44, -38, -32, -26, -20, -10
+//    -62, -56, -50, -44, -38, -32, -26, -20
+    -80, -70, -60, -50, -40, -30, -20, -10
 };
 
 void Application::dispRSSI(int16_t rssi)
@@ -62,7 +64,7 @@ void Application::dispRSSI(int16_t rssi)
 //    Serial.println(rssi);
     Xiaogyan.ledMatrix.setBrightness(3);
     for (int i = 0; i < 8; i++) {
-        if (rssi > rssi_level[i]) {
+        if (rssi >= rssi_level[i]) {
             Xiaogyan.ledMatrix.drawPixel(i, 7, (i > 4)? 1 : 2);
         } else {
             Xiaogyan.ledMatrix.drawPixel(i, 7, 0);
