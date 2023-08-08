@@ -45,8 +45,8 @@ bool EspNowTransport::begin()
   // Set Wifi channel
   esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(m_wifi_channel, WIFI_SECOND_CHAN_NONE);
+  esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_LR);
   esp_wifi_set_promiscuous(false);
-  
   esp_err_t result = esp_now_init();
   if (result == ESP_OK)
   {
