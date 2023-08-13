@@ -31,13 +31,13 @@ void setup()
         EncoderValue_ = constrain(value, 1, 13);
         //Serial.println(EncoderValue_);
         application->setChannel((uint16_t)EncoderValue_);
-        Xiaogyan.ledMatrix.setBrightness(3);
+        Xiaogyan.ledMatrix.setBrightness(5);
         Xiaogyan.ledMatrix.drawChar(2, 0, channel[EncoderValue_], 2, 0, 1);
     });
 
     // Startup Sequence
     //Xiaogyan.speaker.setTone(262);  // C4
-    Xiaogyan.ledMatrix.setBrightness(2);
+    Xiaogyan.ledMatrix.setBrightness(5);
     Xiaogyan.ledMatrix.fillScreen(1);
     delay(200);
     Xiaogyan.ledMatrix.fillScreen(2);

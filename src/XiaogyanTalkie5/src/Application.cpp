@@ -63,7 +63,7 @@ int16_t rssi_level[] = {
 void Application::dispRSSI(int16_t rssi)
 {
 //    Serial.println(rssi);
-    Xiaogyan.ledMatrix.setBrightness(3);
+    Xiaogyan.ledMatrix.setBrightness(5);
     for (int i = 0; i < 8; i++) {
         if (rssi >= rssi_level[i]) {
             Xiaogyan.ledMatrix.drawPixel(i, 7, (i > 4)? 1 : 2);
